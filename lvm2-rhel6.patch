@@ -1,0 +1,121 @@
+--- LVM2.2.02.108/conf/example.conf.in	2014-07-23 16:21:02.000000000 +0100
++++ LVM2.2.02.108-RHEL6/conf/example.conf.in	2014-07-24 15:26:29.000000000 +0100
+@@ -47,7 +47,7 @@
+     # fully. LVM2 needs to be compiled with udev support for this setting to
+     # take effect. N.B. Any device node or symlink not managed by udev in
+     # udev directory will be ignored with this setting on.
+-    obtain_device_list_from_udev = 1
++    obtain_device_list_from_udev = 0
+ 
+     # If several entries in the scanned directories correspond to the
+     # same block device and the tools need to display a name for device,
+@@ -634,7 +634,7 @@
+     #
+     # Specify the '--type <mirror|raid1>' option to override this default
+     # setting.
+-    mirror_segtype_default = "raid1"
++    mirror_segtype_default = "mirror"
+ 
+     # 'raid10_segtype_default' determines the segment types used by default
+     # when the '--stripes/-i' and '--mirrors/-m' arguments are both specified
+@@ -651,7 +651,7 @@
+     #            this setting is not advised.
+     # Specify the '--type <raid10|mirror>' option to override this default
+     # setting.
+-    raid10_segtype_default = "raid10"
++    raid10_segtype_default = "mirror"
+ 
+     # The default format for displaying LV names in lvdisplay was changed 
+     # in version 2.02.89 to show the LV name and path separately.
+--- LVM2.2.02.108/lib/config/defaults.h	2014-07-23 16:21:02.000000000 +0100
++++ LVM2.2.02.108-RHEL6/lib/config/defaults.h	2014-07-24 15:26:29.000000000 +0100
+@@ -29,7 +29,7 @@
+ 
+ #define DEFAULT_DEV_DIR "/dev"
+ #define DEFAULT_PROC_DIR "/proc"
+-#define DEFAULT_OBTAIN_DEVICE_LIST_FROM_UDEV 1
++#define DEFAULT_OBTAIN_DEVICE_LIST_FROM_UDEV 0
+ #define DEFAULT_SYSFS_SCAN 1
+ #define DEFAULT_MD_COMPONENT_DETECTION 1
+ #define DEFAULT_MD_CHUNK_ALIGNMENT 1
+@@ -52,12 +52,12 @@
+ #define DEFAULT_METADATA_READ_ONLY 0
+ #define DEFAULT_LVDISPLAY_SHOWS_FULL_DEVICE_PATH 0
+ 
+-#define DEFAULT_MIRROR_SEGTYPE "raid1"
++#define DEFAULT_MIRROR_SEGTYPE "mirror"
+ #define DEFAULT_MIRRORLOG "disk"
+ #define DEFAULT_MIRROR_LOG_FAULT_POLICY "allocate"
+ #define DEFAULT_MIRROR_IMAGE_FAULT_POLICY "remove"
+ #define DEFAULT_MIRROR_MAX_IMAGES 8 /* limited by kernel DM_KCOPYD_MAX_REGIONS */
+-#define DEFAULT_RAID10_SEGTYPE "raid10"
++#define DEFAULT_RAID10_SEGTYPE "mirror"
+ #define DEFAULT_RAID_FAULT_POLICY "warn"
+ #define DEFAULT_DMEVENTD_RAID_LIB "libdevmapper-event-lvm2raid.so"
+ #define DEFAULT_DMEVENTD_MIRROR_LIB "libdevmapper-event-lvm2mirror.so"
+--- LVM2.2.02.108/man/lvconvert.8.in	2014-07-23 16:21:02.000000000 +0100
++++ LVM2.2.02.108-RHEL6/man/lvconvert.8.in	2014-07-24 15:29:22.000000000 +0100
+@@ -203,12 +203,7 @@
+ Specifies the degree of the mirror you wish to create.
+ For example, "\fB\-m 1\fP" would convert the original logical
+ volume to a mirror volume with 2-sides; that is, a
+-linear volume plus one copy.  There are two implementations of mirroring
+-which correspond to the "\fIraid1\fP" and "\fImirror\fP" segment types.  The default
+-mirroring segment type is "\fIraid1\fP".  If the legacy "\fImirror\fP" segment type
+-is desired, the \fB\-\-type\fP argument must be used to explicitly
+-select the desired type.  The \fB\-\-mirrorlog\fP and \fB\-\-corelog\fP
+-options below are only relevant to the legacy "\fImirror\fP" segment type.
++linear volume plus one copy.
+ .TP
+ .IR \fB\-\-mirrorlog " {" disk | core | mirrored }
+ Specifies the type of log to use.
+--- LVM2.2.02.108/man/lvcreate.8.in	2014-07-23 16:21:02.000000000 +0100
++++ LVM2.2.02.108-RHEL6/man/lvcreate.8.in	2014-07-24 15:26:29.000000000 +0100
+@@ -267,23 +267,17 @@
+ copied.  This is useful for skipping a potentially long and resource
+ intensive initial sync of an empty device.
+ 
+-There are two implementations of mirroring which can be used and correspond
+-to the "raid1" and "mirror" segment types.  The default is "raid1".  See the
+-\fB\-\-type\fP option for more information if you would like to use the
+-legacy "mirror" segment type.  The \fB\-\-mirrorlog\fP and \fB\-\-corelog\fP
+-options apply to the "mirror" segment type only.
+-
+ The optional argument \fB\-\-mirrorlog\fP specifies the type of log to be
+ used for logical volumes utilizing the legacy "mirror" segment type.
+ The default is \fIdisk\fP, which is persistent and requires
+ a small amount of storage space, usually on a separate device from the
+ data being mirrored.  Using \fIcore\fP means the mirror is regenerated
+-by copying the data from the first device each time the logical
+-volume is activated, like after every reboot.  Using \fImirrored\fP
++by copying the data from the first device again each time the logical
++volume is activated, for example, after every reboot.  Using \fImirrored\fP
+ will create a persistent log that is itself mirrored.
+ 
+-When the legacy "mirror" segment type is used, the optional argument
+-\fB\-\-corelog\fP is equivalent to \fB\-\-mirrorlog\fP \fIcore\fP.
++The optional argument \fB\-\-corelog\fP is equivalent
++to \fB\-\-mirrorlog\fP \fIcore\fP.
+ .TP
+ .BR \-\-metadataprofile " " \fIProfileName
+ Uses and attaches the ProfileName configuration profile to the logical
+--- LVM2.2.02.109/VERSION	2014-07-23 16:21:02.000000000 +0100
++++ LVM2.2.02.109-RHEL6/VERSION	2014-07-24 15:27:02.000000000 +0100
+@@ -1 +1 @@
+-2.02.111(2) (2014-09-01)
++2.02.111(2)-RHEL6 (2014-09-01)
+--- LVM2.2.02.109/VERSION_DM	2014-07-23 16:21:02.000000000 +0100
++++ LVM2.2.02.109-RHEL6/VERSION_DM	2014-07-24 15:27:09.000000000 +0100
+@@ -1 +1 @@
+-1.02.90 (2014-09-01)
++1.02.89-RHEL6 (2014-09-01)
+--- LVM2.2.02.108/WHATS_NEW	2014-07-23 16:21:02.000000000 +0100
++++ LVM2.2.02.108-RHEL6/WHATS_NEW	2014-07-24 15:26:29.000000000 +0100
+@@ -396,7 +396,6 @@
+   When creating PV on existing LV don't forbid reserved LV names on LVs below.
+   Split out device_is_suspended_or_blocking from device_is_usable.
+   When converting mirrors, default segtype should be the same unless specified.
+-  Make "raid1" the default mirror segment type.
+   Fix clogd descriptor leak when daemonizing.
+   Fix clvmd descriptor leak on restart.
+   Add pipe_open/close() to use instead of less efficient/secure popen().
