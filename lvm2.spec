@@ -22,7 +22,7 @@
 Summary: Userland logical volume management tools 
 Name: lvm2
 Version: 2.02.111
-Release: 2%{?dist}
+Release: af.3%{?dist}
 License: GPLv2
 Group: System Environment/Base
 URL: http://sources.redhat.com/lvm2
@@ -505,6 +505,9 @@ the device-mapper event library.
 
 
 %changelog
+* Mon Jan 26 2015 Patirck Emer <pemer@afdata.de> - 2.02.111-af.3
+- adding build support for lvm python bindings lib.
+
 * Mon Sep 01 2014 Peter Rajnoha <prajnoha@redhat.com> - 2.02.111-2
 - Make sure shared libraries are built with RELRO option.
 
